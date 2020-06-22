@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="Products_DBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="Invoice">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Invoice_Date" Type="DateTime" Nullable="false" Precision="0" />
+    <Property Name="Total" Type="Double" />
+    <Property Name="Taxes" Type="Double" />
+    <Property Name="Net" Type="Double" />
+    <NavigationProperty Name="Invoice_items" Relationship="Self.FK_Invoice_items_Invoice" FromRole="Invoice" ToRole="Invoice_items" />
+  </EntityType>
+  <EntityType Name="Invoice_items">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" />
+    <Property Name="FK_Invoice" Type="Int32" Nullable="false" />
+    <Property Name="FK_Item" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="Invoice" Relationship="Self.FK_Invoice_items_Invoice" FromRole="Invoice_items" ToRole="Invoice" />
+    <NavigationProperty Name="Item" Relationship="Self.FK_Invoice_items_Item" FromRole="Invoice_items" ToRole="Item" />
+  </EntityType>
+  <EntityType Name="Item">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Price" Type="Double" Nullable="false" />
+    <Property Name="Quantity" Type="Int32" Nullable="false" />
+    <Property Name="FK_Unit" Type="Int32" Nullable="false" />
+    <Property Name="FK_Store" Type="Int32" Nullable="false" />
+    <NavigationProperty Name="Invoice_items" Relationship="Self.FK_Invoice_items_Item" FromRole="Item" ToRole="Invoice_items" />
+    <NavigationProperty Name="Store" Relationship="Self.FK_Item_Store" FromRole="Item" ToRole="Store" />
+    <NavigationProperty Name="Unit" Relationship="Self.FK_Item_Unit" FromRole="Item" ToRole="Unit" />
+  </EntityType>
+  <EntityType Name="Store">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" MaxLength="30" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="Address" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+    <NavigationProperty Name="Items" Relationship="Self.FK_Item_Store" FromRole="Store" ToRole="Item" />
+  </EntityType>
+  <EntityType Name="Unit">
+    <Key>
+      <PropertyRef Name="ID" />
+    </Key>
+    <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Type" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+    <NavigationProperty Name="Items" Relationship="Self.FK_Item_Unit" FromRole="Unit" ToRole="Item" />
+  </EntityType>
+  <Association Name="FK_Invoice_items_Invoice">
+    <End Role="Invoice" Type="Self.Invoice" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="Invoice_items" Type="Self.Invoice_items" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Invoice">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Invoice_items">
+        <PropertyRef Name="FK_Invoice" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Invoice_items_Item">
+    <End Role="Item" Type="Self.Item" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="Invoice_items" Type="Self.Invoice_items" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Item">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Invoice_items">
+        <PropertyRef Name="FK_Item" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Item_Store">
+    <End Role="Store" Type="Self.Store" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="Item" Type="Self.Item" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Store">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Item">
+        <PropertyRef Name="FK_Store" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Item_Unit">
+    <End Role="Unit" Type="Self.Unit" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Role="Item" Type="Self.Item" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Unit">
+        <PropertyRef Name="ID" />
+      </Principal>
+      <Dependent Role="Item">
+        <PropertyRef Name="FK_Unit" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="Products_DBEntities1" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Invoices" EntityType="Self.Invoice" />
+    <EntitySet Name="Invoice_items" EntityType="Self.Invoice_items" />
+    <EntitySet Name="Items" EntityType="Self.Item" />
+    <EntitySet Name="Stores" EntityType="Self.Store" />
+    <EntitySet Name="Units" EntityType="Self.Unit" />
+    <AssociationSet Name="FK_Invoice_items_Invoice" Association="Self.FK_Invoice_items_Invoice">
+      <End Role="Invoice" EntitySet="Invoices" />
+      <End Role="Invoice_items" EntitySet="Invoice_items" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Invoice_items_Item" Association="Self.FK_Invoice_items_Item">
+      <End Role="Item" EntitySet="Items" />
+      <End Role="Invoice_items" EntitySet="Invoice_items" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Item_Store" Association="Self.FK_Item_Store">
+      <End Role="Store" EntitySet="Stores" />
+      <End Role="Item" EntitySet="Items" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Item_Unit" Association="Self.FK_Item_Unit">
+      <End Role="Unit" EntitySet="Units" />
+      <End Role="Item" EntitySet="Items" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>
